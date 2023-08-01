@@ -55,7 +55,7 @@ const GameForm =() => {
     <text>{errors.name.message}</text>
   )}
 
-  {/* <FormLabel>Genre</FormLabel>
+  <FormLabel>Genre</FormLabel>
   <Select placeholder='Select Genre'>
     <option></option>
     {Genre?.results.map((genre) => (
@@ -89,7 +89,7 @@ const GameForm =() => {
   <Input {...register('metacritic', {valueAsNumber: true})} type='number' />
   {errors.metacritic &&(
     <FormErrorMessage>{errors.metacritic.message}</FormErrorMessage>
-  )} */}
+  )}
 
 <Button colorScheme='green' type='submit'>Submit</Button>
     </FormControl>
