@@ -28,13 +28,12 @@ const schema = z.object ({
 //   id: z.number().min(1),
 //   slug: z.string().min(0),
 //   background_image: string,
-name: z.string().min(3),
-//   genres: z.enum(genres),
+  name: z.string().min(3, {message: 'Name must contain atleast 3 characters' }),
+  genres: z.enum(),
 //   publishers: Publisher[],
 //   parent_platforms: { platform: Platform }[],
-  description_raw: z.string().min(0)
-
-  metacritic: z.number().min(0),
+  description_raw: z.string().min(0),
+  metacritic: z.number({invalid_type_error: 'Matacritic field is required'}).min(0).max(100),
 //   rating_top: number,
 }) 
 
@@ -47,7 +46,7 @@ const GameForm =() => {
     const { data: Platform} = usePlatforms();
     const { data: Publisher} = usePublishers();
 
-    const { register, handleSubmit } = useForm<FormData>({resolver: zodResolver(schema)});
+    const { register, handleSubmit, formState: {errors}} = useForm<FormData>({resolver: zodResolver(schema)});
 
     const onSubmit = (data: FieldValues) => console.log(data);
     // const handleSubmit = (event: FormEvent) => {
@@ -59,9 +58,13 @@ const GameForm =() => {
     <FormControl className='mb-3' onSubmit={handleSubmit(onSubmit)}>
   <FormLabel className='mb-3'>Game Name</FormLabel>
   <Input {...register('name')} type='text' />
+  {errors.name &&(
+    <p className="text-danger">{errors.name.message}</p>
+  )}
 
   <FormLabel>Genre</FormLabel>
   <Input {...register('genre')} type='text' />
+  
 
   <FormLabel>Genre</FormLabel>
   <Select placeholder='Select Genre'>
@@ -69,6 +72,9 @@ const GameForm =() => {
     {Genre?.results.map((genre) => (
           <option key={genre.id}>{genre.name}</option>))}
   </Select>
+  {errors.genres &&(
+    <p className="text-danger">{errors.genres.message}</p>
+  )}
 
 <FormLabel>Platforms</FormLabel>
   <CheckboxGroup colorScheme='green' defaultValue={['naruto', 'kakashi']}>
@@ -88,10 +94,16 @@ const GameForm =() => {
 </CheckboxGroup>
 
   <FormLabel>Description</FormLabel>
-  <Input {...register('description')} type='text' />
+  <Input {...register('description_raw')} type='text' />
+  {errors.description_raw &&(
+    <p className="text-danger">{errors.description_raw.message}</p>
+  )}
 
   <FormLabel>Metacritic</FormLabel>
-  <Input {...register('metacritic')} type='number' />
+  <Input {...register('metacritic', {valueAsNumber: true})} type='number' />
+  {errors.metacritic &&(
+    <p className="text-danger">{errors.metacritic.message}</p>
+  )}
 
 <Button colorScheme='green' type='submit'>Submit</Button>
     </FormControl>
