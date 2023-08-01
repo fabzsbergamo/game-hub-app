@@ -1,25 +1,17 @@
-import React, { FormEvent } from 'react'
 import { z } from 'zod'
 import { FieldValues, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers'
-import HomePage from '../pages/HomePage'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
-    Button,
+  Button,
     Checkbox,
     CheckboxGroup,
     FormControl,
+    FormErrorMessage,
     FormLabel,
     Input,
     Select,
-    Spinner,
     Stack,
   } from '@chakra-ui/react'
-import GenreList from './GenreList'
-import genres from '../data/genres'
-import Game from '../entities/Game';
-import GameHeading from './GameHeading'
-import { useParams } from 'react-router-dom'
-import useGame from '../hooks/useGame'
 import useGenres from '../hooks/useGenres'
 import usePlatforms from '../hooks/usePlatforms'
 import usePublishers from '../hooks/usePublishers'
@@ -29,11 +21,11 @@ const schema = z.object ({
 //   slug: z.string().min(0),
 //   background_image: string,
   name: z.string().min(3, {message: 'Name must contain atleast 3 characters' }),
-  genres: z.enum(),
+  // genres: z.enum(genres),
 //   publishers: Publisher[],
 //   parent_platforms: { platform: Platform }[],
-  description_raw: z.string().min(0),
-  metacritic: z.number({invalid_type_error: 'Matacritic field is required'}).min(0).max(100),
+  description_raw: z.string().min(1, {message: 'Description field is required'}),
+  metacritic: z.number({invalid_type_error: 'Matacritic field is required'}).min(0),
 //   rating_top: number,
 }) 
 
@@ -48,33 +40,27 @@ const GameForm =() => {
 
     const { register, handleSubmit, formState: {errors}} = useForm<FormData>({resolver: zodResolver(schema)});
 
-    const onSubmit = (data: FieldValues) => console.log(data);
+    // const onSubmit = (data: FieldValues) => console.log(data);
     // const handleSubmit = (event: FormEvent) => {
     //     event.preventDefault();
     //     console.log()
     // }
 
     return (
-    <FormControl className='mb-3' onSubmit={handleSubmit(onSubmit)}>
-  <FormLabel className='mb-3'>Game Name</FormLabel>
+    <FormControl onSubmit={handleSubmit(data => console.log(data))}>
+
+  <FormLabel>Game Name</FormLabel>
   <Input {...register('name')} type='text' />
   {errors.name &&(
-    <p className="text-danger">{errors.name.message}</p>
+    <text>{errors.name.message}</text>
   )}
 
-  <FormLabel>Genre</FormLabel>
-  <Input {...register('genre')} type='text' />
-  
-
-  <FormLabel>Genre</FormLabel>
+  {/* <FormLabel>Genre</FormLabel>
   <Select placeholder='Select Genre'>
     <option></option>
     {Genre?.results.map((genre) => (
           <option key={genre.id}>{genre.name}</option>))}
   </Select>
-  {errors.genres &&(
-    <p className="text-danger">{errors.genres.message}</p>
-  )}
 
 <FormLabel>Platforms</FormLabel>
   <CheckboxGroup colorScheme='green' defaultValue={['naruto', 'kakashi']}>
@@ -94,16 +80,16 @@ const GameForm =() => {
 </CheckboxGroup>
 
   <FormLabel>Description</FormLabel>
-  <Input {...register('description_raw')} type='text' />
+  <Input {...register('description_raw')} type='text'/>
   {errors.description_raw &&(
-    <p className="text-danger">{errors.description_raw.message}</p>
+    <FormErrorMessage>{errors.description_raw.message}</FormErrorMessage>
   )}
 
   <FormLabel>Metacritic</FormLabel>
   <Input {...register('metacritic', {valueAsNumber: true})} type='number' />
   {errors.metacritic &&(
-    <p className="text-danger">{errors.metacritic.message}</p>
-  )}
+    <FormErrorMessage>{errors.metacritic.message}</FormErrorMessage>
+  )} */}
 
 <Button colorScheme='green' type='submit'>Submit</Button>
     </FormControl>
