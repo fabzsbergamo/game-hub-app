@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { any, string, z } from 'zod'
 import { FieldValues, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -15,22 +15,35 @@ import {
 import useGenres from '../hooks/useGenres'
 import usePlatforms from '../hooks/usePlatforms'
 import usePublishers from '../hooks/usePublishers'
+import Game from '../entities/Game'
+import axios from 'axios'
+import { useMutation } from 'react-query'
+import { Form } from 'react-router-dom'
+import genres from '../data/genres'
+import publishers from '../data/publishers'
+import platforms from '../data/platforms'
 
 const schema = z.object ({
 //   id: z.number().min(1),
 //   slug: z.string().min(0),
 //   background_image: string,
   name: z.string().min(3, {message: 'Name must contain atleast 3 characters' }),
-  // genres: z.enum(genres),
-//   publishers: Publisher[],
-//   parent_platforms: { platform: Platform }[],
-  description_raw: z.string().min(1, {message: 'Description field is required'}),
-  metacritic: z.number({invalid_type_error: 'Matacritic field is required'}).min(0),
+  // genres: z.nativeEnum(genres.results[].name),
+  // publishers: z.string(),
+  // parent_platforms: z.string(),
+  description_raw: z.string().min(3, {message: 'Description field is required'}),
+  metacritic: z.number({invalid_type_error: 'A number for Matacritic field is required'}).min(1),
 //   rating_top: number,
 }) 
 
 type FormData = z.infer<typeof schema>;
 
+// const addGame = useMutation({
+//   mutationFn: (game: Game) =>
+//   axios
+//   .post('https://api.rawg.io/api/games', + game)
+//   .then(res => res.data)
+// });
 
 const GameForm =() => {
 
@@ -39,27 +52,41 @@ const GameForm =() => {
     const { data: Publisher} = usePublishers();
 
     const { register, handleSubmit, formState: {errors}} = useForm<FormData>({resolver: zodResolver(schema)});
+    
+    const onSubmit = (data: FieldValues, event: Event) => {
+      console.log('data', data);
+      console.log('event', Event);
 
-    // const onSubmit = (data: FieldValues) => console.log(data);
-    // const handleSubmit = (event: FormEvent) => {
-    //     event.preventDefault();
-    //     console.log()
-    // }
+      // addGame.mutate({
+      //   id: 0,
+      //   name: data.name,
+      //   slug: data.name,
+      //   description_raw: data.description_raw,
+      //   genres: [],
+      //   publishers: [],
+      //   background_image: '',
+      //   parent_platforms: [],
+      //   metacritic: data.metacritic,
+      //   rating_top: 0
+      // })
+    }
 
     return (
-    <FormControl onSubmit={handleSubmit(data => console.log(data))}>
-
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      
   <FormLabel>Game Name</FormLabel>
-  <Input {...register('name')} type='text' />
+  <Input {...register("name")} placeholder="Game name" type="text" />
   {errors.name &&(
     <text>{errors.name.message}</text>
   )}
 
   <FormLabel>Genre</FormLabel>
   <Select placeholder='Select Genre'>
-    <option></option>
     {Genre?.results.map((genre) => (
           <option key={genre.id}>{genre.name}</option>))}
+          {/* {errors.genres &&(
+    <text>{errors.genres.message}</text>
+    )} */}
   </Select>
 
 <FormLabel>Platforms</FormLabel>
@@ -82,17 +109,17 @@ const GameForm =() => {
   <FormLabel>Description</FormLabel>
   <Input {...register('description_raw')} type='text'/>
   {errors.description_raw &&(
-    <FormErrorMessage>{errors.description_raw.message}</FormErrorMessage>
+    <text>{errors.description_raw.message}</text>
   )}
 
   <FormLabel>Metacritic</FormLabel>
   <Input {...register('metacritic', {valueAsNumber: true})} type='number' />
   {errors.metacritic &&(
-    <FormErrorMessage>{errors.metacritic.message}</FormErrorMessage>
+    <text>{errors.metacritic.message}</text>
   )}
 
 <Button colorScheme='green' type='submit'>Submit</Button>
-    </FormControl>
+    </Form>
  );
 };
 
